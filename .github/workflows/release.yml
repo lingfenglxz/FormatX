@@ -1,0 +1,23 @@
+name: Release
+on:
+  push:
+    tags: ['v*']
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 24 }
+      - run: npm.cmd ci
+      - run: npm.cmd test -- --run
+      - uses: tauri-apps/tauri-action@v0
+        env: { GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} }
+        with:
+          tagName: ${{ github.ref_name }}
+          releaseName: FormatX ${{ github.ref_name }}
+          releaseBody: Local JSON/XML formatter for Windows.
+          releaseDraft: false
+          prerelease: false
