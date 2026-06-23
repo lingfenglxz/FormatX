@@ -1,6 +1,6 @@
 [package]
 name = "formatx"
-version = "0.1.0"
+version = "0.2.0"
 description = "Local JSON and XML formatter"
 edition = "2021"
 

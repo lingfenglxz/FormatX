@@ -67,13 +67,11 @@ function highlightJson(text: string, query: string): string {
   if (query) {
     try { html = html.replace(new RegExp(`(${escapeRegExp(query)})`, 'gi'), '<mark>$1</mark>'); } catch { /* noop */ }
   }
-  // token 着色
-  html = html.replace(/(\s*"(?:[^"\\]|\\.)*")(\s*:)/g, '<span class="tok-key">$1</span>$2');
-  html = html.replace(/(\s*"(?:[^"\\]|\\.)*")/g, '<span class="tok-str">$1</span>');
-  html = html.replace(/(-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)/g, '<span class="tok-num">$1</span>');
-  html = html.replace(/\b(true|false)\b/g, '<span class="tok-bool">$1</span>');
-  html = html.replace(/\b(null)\b/g, '<span class="tok-null">$1</span>');
-  return html;
+  return html.replace(/"(?:[^"\\]|\\.)*"|-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?|\b(?:true|false|null)\b/g, (token, offset, source) => {
+    const isKey = token.startsWith('"') && /^\s*:/.test(source.slice(offset + token.length));
+    const cls = token.startsWith('"') ? (isKey ? 'tok-key' : 'tok-str') : token === 'null' ? 'tok-null' : /^(true|false)$/.test(token) ? 'tok-bool' : 'tok-num';
+    return `<span class="${cls}">${token}</span>`;
+  });
 }
 
 /* ========== 输入组件 ========== */
@@ -118,6 +116,8 @@ function EditableValue({ value, query, isCurrent, onChange }: { value: unknown; 
 /* ========== 树组件 ========== */
 interface JsonTreeProps {
   value: unknown;
+  label?: string;
+  onRename?: (next: string) => void;
   depth: number;
   query: string;
   activePath: string[] | null;
@@ -125,7 +125,7 @@ interface JsonTreeProps {
   onNodeRef?: (el: HTMLDivElement | null) => void;
   currentPath?: string[];
 }
-function JsonTree({ value, depth, query, activePath, onChange, onNodeRef, currentPath = [] }: JsonTreeProps) {
+function JsonTree({ value, label, onRename, depth, query, activePath, onChange, onNodeRef, currentPath = [] }: JsonTreeProps) {
   const isOnPath = activePath !== null && activePath.length > currentPath.length && activePath.slice(0, currentPath.length).join('.') === currentPath.join('.');
   const isCurrent = activePath !== null && activePath.join('.') === currentPath.join('.');
   const [manualOpen, setManualOpen] = useState(depth === 0);  // 仅根节点默认展开
@@ -141,28 +141,45 @@ function JsonTree({ value, depth, query, activePath, onChange, onNodeRef, curren
     const hasMatch = query ? entries.some(([k, v]) => k.toLowerCase().includes(query.toLowerCase()) || matchText(v, query)) : false;
     return (
       <div className={`node${open ? ' open' : ''}${hasMatch ? ' matched' : ''}${isCurrent ? ' current' : ''}`} ref={isCurrent ? (el) => onNodeRef?.(el) : undefined}>
-        <div className="node-head" onClick={() => setManualOpen(!open)}>
+        <div className={`node-head${label !== undefined ? ' has-label' : ''}`} onClick={() => setManualOpen(!open)}>
           <span className="chevron">{open ? '▾' : '▸'}</span>
+          {label !== undefined && (onRename
+            ? <AutoKeyInput value={label} onChange={onRename} />
+            : <span className="key" dangerouslySetInnerHTML={{ __html: highlightHtml(label, query) }} />)}
+          {label !== undefined && <span className="colon">:</span>}
           <span className="bracket">{ob}</span>
-          {!open && <span className="ellipsis">{entries.length ? '…' : ''}</span>}
-          {!open && <span className="bracket">{cb}</span>}
-          <span className="meta">{entries.length}{isArray ? ' 项' : ' 键'}</span>
+          {!open && <>
+            <span className="ellipsis">{entries.length ? '…' : ''}</span>
+            <span className="meta">{entries.length}{isArray ? ' 项' : ' 键'}</span>
+            <span className="bracket">{cb}</span>
+          </>}
         </div>
         {open && (
           <div className="node-body">
             {entries.map(([key, child]) => {
               const cp = [...currentPath, key];
               const childActive = activePath !== null && cp.join('.') === activePath.slice(0, cp.length).join('.');
+              const updateChild = (next: unknown) => onChange(setJsonPrimitive(value as Record<string, unknown>, [key], next));
+              const renameChild = (next: string) => onChange(renameJsonKey(value as Record<string, unknown>, [key], next));
+              if (child && typeof child === 'object') {
+                return (
+                  <JsonTree
+                    key={key} value={child} label={key} onRename={isArray ? undefined : renameChild}
+                    depth={depth + 1} query={query} activePath={childActive ? activePath : null}
+                    onChange={updateChild} onNodeRef={onNodeRef} currentPath={cp}
+                  />
+                );
+              }
               return (
                 <div className="prop" key={key}>
                   {isArray
                     ? <span className="key" dangerouslySetInnerHTML={{ __html: highlightHtml(key, query) }} />
-                    : <AutoKeyInput value={key} onChange={(next) => onChange(renameJsonKey(value as Record<string, unknown>, [key], next))} />}
+                    : <AutoKeyInput value={key} onChange={renameChild} />}
                   <span className="colon">:</span>
                   <JsonTree
                     value={child} depth={depth + 1} query={query}
                     activePath={childActive ? activePath : null}
-                    onChange={(next) => onChange(setJsonPrimitive(value as Record<string, unknown>, [key], next))}
+                    onChange={updateChild}
                     onNodeRef={onNodeRef} currentPath={cp}
                   />
                 </div>

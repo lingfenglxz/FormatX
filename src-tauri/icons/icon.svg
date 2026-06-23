@@ -1,18 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#3b82f6"/>
-      <stop offset="1" stop-color="#1d4ed8"/>
+    <linearGradient id="blue" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#1684ff"/>
+      <stop offset="1" stop-color="#2519d8"/>
     </linearGradient>
   </defs>
-  <rect width="256" height="256" rx="56" fill="url(#bg)"/>
-  <!-- 左花括号 { -->
-  <path fill="none" stroke="#fff" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"
-    d="M104 64c-22 0-30 8-30 26 0 14-6 22-18 22 12 0 18 8 18 22 0 18 8 26 30 26"/>
-  <!-- 右花括号 } -->
-  <path fill="none" stroke="#fff" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"
-    d="M152 64c22 0 30 8 30 26 0 14 6 22 18 22-12 0-18 8-18 22 0 18-8 26-30 26"/>
-  <!-- 中间对齐点，表示格式化/对齐 -->
-  <circle cx="128" cy="112" r="9" fill="#fff"/>
-  <circle cx="128" cy="144" r="9" fill="#fff"/>
+  <rect x="6" y="6" width="500" height="500" rx="92" fill="url(#blue)"/>
+  <path fill="#fff" d="M136 136h58l62 93 62-93h58l-91 120 93 120h-58l-64-95-64 95h-58l93-120z"/>
 </svg>

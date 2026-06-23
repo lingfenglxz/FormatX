@@ -118,7 +118,7 @@ html,body,#root{height:100%;overflow:hidden}
   caret-color:var(--fg);
   -webkit-text-fill-color:transparent;
 }
-.editor-wrap textarea::selection{background:var(--accent);mix-blend-mode:screen}
+.editor-wrap textarea::selection{background:var(--accent);color:var(--accent-fg);-webkit-text-fill-color:var(--accent-fg)}
 .editor-wrap textarea::spelling-error{text-decoration:none}
 
 /* 语法 token */
@@ -156,13 +156,15 @@ html,body,#root{height:100%;overflow:hidden}
 .node-head{display:flex;align-items:center;gap:2px;cursor:pointer;padding:1px 4px;border-radius:var(--radius);white-space:nowrap}
 .node-head:hover{background:var(--bg-hover)}
 .chevron{display:inline-flex;align-items:center;justify-content:center;width:12px;color:var(--muted);font-size:9px;flex-shrink:0}
+.node-head.has-label{padding-left:0;gap:0}
+.node-head.has-label .chevron{margin-left:-12px}
 .bracket{color:var(--fg);font-weight:400}
 .ellipsis{color:var(--muted);padding:0 2px}
 .meta{color:var(--muted);font-size:10px;margin-left:3px}
 
-/* 缩进：仅 12px，压缩到 2-3 字符 */
-.node-body{padding-left:12px;border-left:1px dotted var(--border);margin-left:6px}
-.node-tail{padding-left:0}
+/* 子项从父字段名（越过 12px 箭头）再缩进两个等宽字符 */
+.node-body{padding-left:calc(2ch + 12px);border-left:1px dotted var(--border);margin-left:0}
+.node-tail{padding-left:0;margin-left:-2px}
 .prop{display:flex;align-items:baseline;white-space:nowrap;min-height:20px;line-height:1.6}
 
 .key{color:var(--key)}

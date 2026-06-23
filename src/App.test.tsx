@@ -13,6 +13,34 @@ it('formats the editor content in place', async () => {
   expect(textarea.value).toContain('\n');
 });
 
+it('keeps pasted JSON free of syntax token markup', () => {
+  render(<App />);
+  const textarea = document.querySelector('textarea') as HTMLTextAreaElement;
+  fireEvent.change(textarea, { target: { value: '{"customerOrder":{"custId":1}}' } });
+  expect(textarea.value).toBe('{"customerOrder":{"custId":1}}');
+  expect(document.querySelector('.editor-mirror')!.textContent).not.toContain('tok-key');
+});
+
+it('places a child chevron before its key label', () => {
+  render(<App />);
+  const textarea = document.querySelector('textarea') as HTMLTextAreaElement;
+  fireEvent.change(textarea, { target: { value: '{"customerOrder":{"custId":1}}' } });
+  const childHead = document.querySelectorAll('.node-head')[1];
+  expect(childHead.firstElementChild?.classList.contains('chevron')).toBe(true);
+  expect(childHead.querySelector('input')?.value).toBe('customerOrder');
+});
+
+it('shows item counts only inside collapsed brackets', () => {
+  render(<App />);
+  const textarea = document.querySelector('textarea') as HTMLTextAreaElement;
+  fireEvent.change(textarea, { target: { value: '{"customerOrder":{"custId":1}}' } });
+  const heads = document.querySelectorAll('.node-head');
+  expect(heads[0].querySelector('.meta')).toBeNull();
+  expect(heads[1].querySelector('.meta')?.textContent).toBe('1 键');
+  expect(heads[1].lastElementChild?.classList.contains('bracket')).toBe(true);
+});
+
+
 it('creates and switches between tabs', async () => {
   render(<App />);
   const addBtn = screen.getByTitle('新建标签');
