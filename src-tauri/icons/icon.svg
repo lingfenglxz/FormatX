@@ -1,4 +1,18 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
-  <rect width="256" height="256" rx="48" fill="#2563eb"/>
-  <path fill="#fff" d="M62 62h132v30H96v42h78v30H96v72H62zm76 45h56v30h-56zm0 60h56v30h-56z"/>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3b82f6"/>
+      <stop offset="1" stop-color="#1d4ed8"/>
+    </linearGradient>
+  </defs>
+  <rect width="256" height="256" rx="56" fill="url(#bg)"/>
+  <!-- 左花括号 { -->
+  <path fill="none" stroke="#fff" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"
+    d="M104 64c-22 0-30 8-30 26 0 14-6 22-18 22 12 0 18 8 18 22 0 18 8 26 30 26"/>
+  <!-- 右花括号 } -->
+  <path fill="none" stroke="#fff" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"
+    d="M152 64c22 0 30 8 30 26 0 14 6 22 18 22-12 0-18 8-18 22 0 18-8 26-30 26"/>
+  <!-- 中间对齐点，表示格式化/对齐 -->
+  <circle cx="128" cy="112" r="9" fill="#fff"/>
+  <circle cx="128" cy="144" r="9" fill="#fff"/>
 </svg>
