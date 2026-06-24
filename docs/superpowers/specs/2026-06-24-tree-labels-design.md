@@ -14,7 +14,7 @@
 
 ## 范围
 
-仅修改 `src/App.tsx` 中现有的 `JsonTree` 渲染和 `src/App.test.tsx` 中与该标签规则对应的测试；不引入依赖或替换树组件。
+仅修改 `src/App.tsx` 中现有的 `JsonTree` 渲染和 `src/App.test.tsx` 中与该标签规则对应的测试；不引入依赖或替换树组件。验证通过后复用既有发布脚本更新 Windows 安装包与便携 ZIP。
 
 ## 验证
 

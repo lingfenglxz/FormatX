@@ -136,23 +136,18 @@ function JsonTree({ value, label, onRename, depth, query, activePath, onChange, 
       ? (value as unknown[]).map((v, i) => [String(i), v] as const)
       : Object.entries(value as Record<string, unknown>);
     const isArray = Array.isArray(value);
-    const ob = isArray ? '[' : '{';
-    const cb = isArray ? ']' : '}';
+    const count = `${isArray ? '[' : '{'}${entries.length}${isArray ? ']' : '}'}`;
+    const nodeLabel = label ?? (depth === 0 ? 'object' : undefined);
     const hasMatch = query ? entries.some(([k, v]) => k.toLowerCase().includes(query.toLowerCase()) || matchText(v, query)) : false;
     return (
       <div className={`node${open ? ' open' : ''}${hasMatch ? ' matched' : ''}${isCurrent ? ' current' : ''}`} ref={isCurrent ? (el) => onNodeRef?.(el) : undefined}>
-        <div className={`node-head${label !== undefined ? ' has-label' : ''}`} onClick={() => setManualOpen(!open)}>
+        <div className={`node-head${nodeLabel !== undefined ? ' has-label' : ''}`} onClick={() => setManualOpen(!open)}>
           <span className="chevron">{open ? '▾' : '▸'}</span>
           {label !== undefined && (onRename
             ? <AutoKeyInput value={label} onChange={onRename} />
             : <span className="key" dangerouslySetInnerHTML={{ __html: highlightHtml(label, query) }} />)}
-          {label !== undefined && <span className="colon">:</span>}
-          <span className="bracket">{ob}</span>
-          {!open && <>
-            <span className="ellipsis">{entries.length ? '…' : ''}</span>
-            <span className="meta">{entries.length}{isArray ? ' 项' : ' 键'}</span>
-            <span className="bracket">{cb}</span>
-          </>}
+          {label === undefined && nodeLabel !== undefined && <span>{nodeLabel}</span>}
+          <span className="meta"> {count}</span>
         </div>
         {open && (
           <div className="node-body">
@@ -185,7 +180,6 @@ function JsonTree({ value, label, onRename, depth, query, activePath, onChange, 
                 </div>
               );
             })}
-            <div className="node-tail"><span className="bracket">{cb}</span></div>
           </div>
         )}
       </div>

@@ -30,14 +30,18 @@ it('places a child chevron before its key label', () => {
   expect(childHead.querySelector('input')?.value).toBe('customerOrder');
 });
 
-it('shows item counts only inside collapsed brackets', () => {
+it('shows inline counts for root and container nodes while expanded', () => {
   render(<App />);
   const textarea = document.querySelector('textarea') as HTMLTextAreaElement;
-  fireEvent.change(textarea, { target: { value: '{"customerOrder":{"custId":1}}' } });
+  fireEvent.change(textarea, { target: { value: '{"customerOrder":{"custId":1},"prodOrderItems":[1,2]}' } });
   const heads = document.querySelectorAll('.node-head');
-  expect(heads[0].querySelector('.meta')).toBeNull();
-  expect(heads[1].querySelector('.meta')?.textContent).toBe('1 键');
-  expect(heads[1].lastElementChild?.classList.contains('bracket')).toBe(true);
+  expect(heads[0].textContent).toContain('object {2}');
+  expect((heads[1].querySelector('input') as HTMLInputElement).value).toBe('customerOrder');
+  expect(heads[1].textContent).toContain(' {1}');
+  expect((heads[2].querySelector('input') as HTMLInputElement).value).toBe('prodOrderItems');
+  expect(heads[2].textContent).toContain(' [2]');
+  expect(document.querySelector('.ellipsis')).toBeNull();
+  expect(document.querySelector('.bracket')).toBeNull();
 });
 
 
